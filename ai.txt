@@ -1,0 +1,884 @@
+################# 1 bfs dfs #################
+# **BFS** **Approach**
+
+import numpy as np
+
+def bfs(src, target):
+    queue = []          #nodes to be explored
+    queue.append(src)
+
+    exp = []            #nodes already explored
+
+    while len(queue) > 0:
+        source = queue.pop(0)
+        exp.append(source)
+
+        print_puzzle(source)
+
+        if source == target:
+            print()
+            print("Success! Goal state achieved!")
+            return
+
+        #If direction is possible then add state to move
+        poss_moves_to_do = possible_moves(source, exp)
+
+        for move in poss_moves_to_do:
+            if move not in exp and move not in queue:
+                queue.append(move)
+########
+
+def possible_moves(state, visited_states):
+    b = state.index(0)       #index of empty tile
+    d = []                   #directions array
+
+    if b not in [0, 1, 2]:
+        d.append('u')
+    if b not in [6, 7, 8]:
+        d.append('d')
+    if b not in [0, 3, 6]:
+        d.append('l')
+    if b not in [2, 5, 8]:
+        d.append('r')
+
+    pos_moves_it_can = []
+
+    # For all possible directions, find the state if that move is played
+    for i in d:
+        pos_moves_it_can.append(gen(state, i, b))
+
+    return [move_it_can for move_it_can in pos_moves_it_can if move_it_can not in visited_states]
+
+
+############
+def gen(state, m, b):
+    temp = state.copy()
+
+    if m == 'd':
+        temp[b+3], temp[b] = temp[b], temp[b+3]
+
+    if m == 'u':
+        temp[b-3], temp[b] = temp[b], temp[b-3]
+
+    if m == 'l':
+        temp[b-1], temp[b] = temp[b], temp[b-1]
+
+    if m == 'r':
+        temp[b+1], temp[b] = temp[b], temp[b+1]
+
+    return temp
+
+###############
+def print_puzzle(state):
+    print(np.array(state).reshape(3, 3))
+    print()
+
+src = [1, 2, 3, 4, 5, 6, 0, 7, 8]
+target = [1, 2, 3, 4, 5, 6, 7, 8, 0]
+
+print("Initial state: ")
+print_puzzle(src)       #initial state
+print()
+
+print("Goal state: ")
+print_puzzle(target)    #goal state
+print()
+
+print("BFS solution:")
+bfs(src, target)
+
+###################
+
+# **DFS** **Approach**
+
+import numpy as np
+
+def dfs(src, target):
+    stack = []          #nodes to be explored
+    stack.append(src)
+
+    exp = []            #explored nodes
+
+    while len(stack) > 0:
+        source = stack.pop()
+        exp.append(source)
+
+        print_puzzle(source)
+
+        if source == target:
+            print()
+            print("Success! Goal state achieved!")
+            return
+
+        # If direction is possible then add state to move
+        poss_moves_to_do = possible_moves(source, exp)
+
+        for move in poss_moves_to_do:
+            if move not in exp and move not in stack:
+                stack.append(move)
+
+
+#########################
+def possible_moves(state, visited_states):
+    b = state.index(0)     #index of empty tile
+    d = []                 #directions array
+
+    if b not in [0, 1, 2]:                  # [0  1  2]
+        d.append('u')                       # [3  4  5]
+    if b not in [6, 7, 8]:                  # [6  7  8]
+        d.append('d')
+    if b not in [0, 3, 6]:
+        d.append('l')
+    if b not in [2, 5, 8]:
+        d.append('r')
+
+    pos_moves_it_can = []
+
+    # For all possible directions, the state if that move is played
+    for i in d:
+        pos_moves_it_can.append(gen(state, i, b))
+
+    return [move_it_can for move_it_can in pos_moves_it_can if move_it_can not in visited_states]
+
+
+####################
+def gen(state, m, b):
+    temp = state.copy()
+
+    if m == 'd':
+        temp[b+3], temp[b] = temp[b], temp[b+3]
+
+    if m == 'u':
+        temp[b-3], temp[b] = temp[b], temp[b-3]
+
+    if m == 'l':
+        temp[b-1], temp[b] = temp[b], temp[b-1]
+
+    if m == 'r':
+        temp[b+1], temp[b] = temp[b], temp[b+1]
+
+    return temp
+
+
+############################
+
+def print_puzzle(state):
+    print(np.array(state).reshape(3, 3))
+    print()
+
+src = [1, 2, 3, 4, 5, 6, 0, 7, 8]     #initial state
+target = [1, 2, 3, 4, 5, 6, 7, 8, 0]  #goal state
+
+print("Initial state: ")
+print_puzzle(src)       #initial state
+print()
+
+print("Goal state: ")
+print_puzzle(target)    #goal state
+print()
+
+print("DFS solution:")
+dfs(src, target)
+
+
+
+
+############################## 2 constraint satisfaction ##############
+# Map Coloring Problem using Backtracking with Step-by-Step Output
+
+# Function to check if the current color assignment is safe for the vertex
+def is_safe(vertex, graph, colors, color, assigned_colors):
+    for i in range(len(graph)):
+        if graph[vertex][i] == 1 and assigned_colors[i] == color:
+            return False
+    return True
+
+# Function to print the current state of color assignments
+def print_assignment(assigned_colors, step):
+    print(f"Step {step}: {assigned_colors}")
+
+# Function to solve the map coloring problem using backtracking with step-by-step output
+def map_coloring(graph, colors, assigned_colors, vertex, step):
+    # If all vertices are assigned a color, return True
+    if vertex == len(graph):
+        return True
+
+    # Try different colors for the current vertex
+    for color in colors:
+        if is_safe(vertex, graph, colors, color, assigned_colors):
+            # Assign the current color to the vertex
+            assigned_colors[vertex] = color
+            print_assignment(assigned_colors, step)
+            step += 1  # Increment step for next assignment
+
+            # Recur to assign colors to the rest of the vertices
+            if map_coloring(graph, colors, assigned_colors, vertex + 1, step):
+                return True
+
+            # If assigning color didn't lead to a solution, backtrack
+            assigned_colors[vertex] = None  # Backtrack
+            print(f"Backtrack from Step {step}")
+
+    return False
+
+# Main function to solve the problem
+def solve_map_coloring(graph, colors):
+    assigned_colors = [None] * len(graph)  # Initialize all vertices as unassigned
+    step = 1  # Start the step counter
+
+    if not map_coloring(graph, colors, assigned_colors, 0, step):
+        print("No solution exists")
+        return None
+
+    return assigned_colors
+
+
+# Adjacency matrix of the map (Graph)
+graph = [
+    [0, 1, 0, 1],  # Region 1 is connected to Region 2 and Region 4
+    [1, 0, 1, 1],  # Region 2 is connected to Region 1, Region 3, and Region 4
+    [0, 1, 0, 1],  # Region 3 is connected to Region 2 and Region 4
+    [1, 1, 1, 0]   # Region 4 is connected to Region 1, Region 2, and Region 3
+]
+
+# graph = [
+#     [0, 1, 0, 1, 0],  # Region 1 is connected to Region 2 and Region 4
+#     [1, 0, 1, 1, 1],  # Region 2 is connected to Region 1, Region 3, Region 4, and Region 5
+#     [0, 1, 0, 0, 1],  # Region 3 is connected to Region 2 and Region 5
+#     [1, 1, 0, 0, 1],  # Region 4 is connected to Region 1, Region 2, and Region 5
+#     [0, 1, 1, 1, 0]   # Region 5 is connected to Region 2, Region 3, and Region 4
+# ]
+
+
+# List of available colors
+colors = ['Red', 'Green', 'Blue']
+
+# Solve the problem and print the result
+solution = solve_map_coloring(graph, colors)
+
+if solution:
+    print("\nFinal Solution:", solution)
+
+###################### 2 ######## canibles 
+ State is represented as (missionaries_left, cannibals_left, boat_position)
+# boat_position = 1 means the boat is on the starting side, 0 means it's on the other side
+
+# Function to check if the state is valid
+def is_valid_state(state):
+    missionaries_left, cannibals_left, _ = state
+    missionaries_right = 3 - missionaries_left
+    cannibals_right = 3 - cannibals_left
+
+    # More cannibals than missionaries on either side is invalid
+    if (missionaries_left > 0 and cannibals_left > missionaries_left) or \
+       (missionaries_right > 0 and cannibals_right > missionaries_right):
+        return False
+    return True
+
+# Function to generate all possible valid next states
+def get_successors(state):
+    successors = []
+    missionaries_left, cannibals_left, boat_position = state
+    boat_direction = -1 if boat_position == 1 else 1  # Boat moves to the opposite side
+
+    # Possible moves (1 missionary, 1 cannibal), (2 missionaries), etc.
+    possible_moves = [(1, 0), (0, 1), (1, 1), (2, 0), (0, 2)]
+
+    for missionaries, cannibals in possible_moves:
+        new_missionaries_left = missionaries_left + boat_direction * missionaries
+        new_cannibals_left = cannibals_left + boat_direction * cannibals
+        new_state = (new_missionaries_left, new_cannibals_left, 1 - boat_position)
+        if 0 <= new_missionaries_left <= 3 and 0 <= new_cannibals_left <= 3 and is_valid_state(new_state):
+            successors.append(new_state)
+
+    return successors
+
+# Function to get user input for the next move
+def get_user_input(state):
+    print("\nCurrent state:")
+    print(f"Missionaries Left: {state[0]}, Cannibals Left: {state[1]}, Boat on {'Left' if state[2] == 1 else 'Right'} Side")
+
+    try:
+        missionaries = int(input("Enter number of missionaries to move (0-2): "))
+        cannibals = int(input("Enter number of cannibals to move (0-2): "))
+    except ValueError:
+        print("Invalid input. Please enter integers only.")
+        return None
+
+    if 0 <= missionaries <= 2 and 0 <= cannibals <= 2 and (missionaries + cannibals) > 0:
+        return (missionaries, cannibals)
+    else:
+        print("Invalid move. Try again.")
+        return None
+
+# Main function to run the user-interactive version of the problem solver
+def play_missionaries_and_cannibals():
+    state = (3, 3, 1)  # Start with 3 missionaries, 3 cannibals, boat on starting side
+    goal_state = (0, 0, 0)  # Goal is to get everyone across with boat on the other side
+
+    visited = set([state])  # Keep track of visited states
+
+    while state != goal_state:
+        move = None
+        while move is None:
+            move = get_user_input(state)
+
+        missionaries, cannibals = move
+        boat_direction = -1 if state[2] == 1 else 1
+        new_state = (
+            state[0] + boat_direction * missionaries,
+            state[1] + boat_direction * cannibals,
+            1 - state[2]
+        )
+
+        if 0 <= new_state[0] <= 3 and 0 <= new_state[1] <= 3 and is_valid_state(new_state):
+            state = new_state
+            if state == goal_state:
+                print("\nCongratulations! You've successfully moved all missionaries and cannibals to the other side!")
+                break
+            visited.add(state)
+        else:
+            print("Invalid move. The state is either not allowed or violates the problem constraints. Try again.")
+
+    if state != goal_state:
+        print("\nGame Over. Better luck next time!")
+
+# Start the game
+play_missionaries_and_cannibals()
+
+
+
+################# 3 family tree using knowledge base ############
+class FamilyTreeKB:
+    def __init__(self):
+        self.facts = set()  # Known relationships (facts)
+        self.rules = []     # Inference rules
+
+    def add_fact(self, fact):
+        """Add a new fact to the knowledge base."""
+        self.facts.add(fact)
+
+    def add_rule(self, conditions, conclusion):
+        """Add a new inference rule."""
+        self.rules.append((conditions, conclusion))
+
+    def match_conditions_with_facts(self, conditions):
+        """Find variable bindings that satisfy the conditions. matching condition with fact"""
+        bindings_list = []
+
+        def unify(condition, fact, bindings):
+            """Try to unify a single condition with a fact."""
+            for c, f in zip(condition, fact):
+                if isinstance(c, str) and c.isupper():  # Variable like "X", "Y"
+                    if c in bindings:
+                        if bindings[c] != f:  # Conflicting binding
+                            return False
+                    else:
+                        bindings[c] = f  # Add new binding
+                elif c != f:  # Mismatched constants
+                    return False
+            return True
+
+        for fact in self.facts:
+            for condition in conditions:
+                bindings = {}
+                if len(condition) == len(fact) and unify(condition, fact, bindings):
+                    bindings_list.append(bindings)
+
+        return bindings_list
+
+    def forward_chain(self):
+        """Apply forward chaining to infer new relationships."""
+        while True:
+            new_fact_added = False  # Tracks if new facts are added in this iteration
+
+            for conditions, conclusion in self.rules:
+                # Find matches for variables in the conditions
+                bindings_list = self.match_conditions_with_facts(conditions)
+
+                for bindings in bindings_list:
+                    # Replace variables in conclusion using bindings
+                    derived_fact = tuple(bindings.get(var, var) for var in conclusion)
+
+                    # Ensure derived fact does not contain unresolved variables
+                    if all(not isinstance(val, str) or not val.isupper() for val in derived_fact):
+                        if derived_fact not in self.facts:
+                            self.facts.add(derived_fact)
+                            new_fact_added = True
+                            print(f"Derived fact: {derived_fact}")
+
+            if not new_fact_added:  # Stop when no new facts can be derived
+                break
+
+
+
+
+
+
+# Create the family tree knowledge base
+kb = FamilyTreeKB()
+
+# Add basic family relationships (facts)
+kb.add_fact(("parent", "John", "Mary"))  # John is a parent of Mary
+kb.add_fact(("parent", "Sarah", "Mary"))  # Sarah is a parent of Mary
+kb.add_fact(("parent", "Sarah", "Tom"))  # Sarah is a parent of Tom
+kb.add_fact(("parent", "Tom", "Lisa"))  # Tom is a parent of Lisa
+
+# Add rules to infer other relationships
+kb.add_rule([("parent", "X", "Y")], ("child", "Y", "X"))  # Child rule
+kb.add_rule([("parent", "X", "Y"), ("parent", "X", "Z"), ("Y", "!=", "Z")], 
+            ("sibling", "Y", "Z"))  # Sibling rule
+kb.add_rule([("parent", "X", "Y"), ("parent", "Y", "Z")], ("grandparent", "X", "Z"))  # Grandparent rule
+
+
+
+
+
+# Apply forward chaining to infer relationships
+print("Initial Facts:", kb.facts)
+kb.forward_chain()
+print("Final Facts:", kb.facts)
+
+
+
+################### 4 A* algo ###########
+# Python program for A* Search Algorithm
+import math
+import heapq
+
+# Define the Cell class
+
+
+class Cell:
+    def __init__(self):
+      # Parent cell's row index
+        self.parent_i = 0
+    # Parent cell's column index
+        self.parent_j = 0
+ # Total cost of the cell (g + h)
+        self.f = float('inf')
+    # Cost from start to this cell
+        self.g = float('inf')
+    # Heuristic cost from this cell to destination
+        self.h = 0
+
+
+# Define the size of the grid
+ROW = 9
+COL = 10
+
+# Check if a cell is valid (within the grid)
+
+
+def is_valid(row, col):
+    return (row >= 0) and (row < ROW) and (col >= 0) and (col < COL)
+
+# Check if a cell is unblocked
+
+
+def is_unblocked(grid, row, col):
+    return grid[row][col] == 1
+
+# Check if a cell is the destination
+
+
+def is_destination(row, col, dest):
+    return row == dest[0] and col == dest[1]
+
+# Calculate the heuristic value of a cell (Euclidean distance to destination)
+
+
+def calculate_h_value(row, col, dest):
+    return ((row - dest[0]) ** 2 + (col - dest[1]) ** 2) ** 0.5
+
+# Trace the path from source to destination
+
+
+def trace_path(cell_details, dest):
+    print("The Path is ")
+    path = []
+    row = dest[0]
+    col = dest[1]
+
+    # Trace the path from destination to source using parent cells
+    while not (cell_details[row][col].parent_i == row and cell_details[row][col].parent_j == col):
+        path.append((row, col))
+        temp_row = cell_details[row][col].parent_i
+        temp_col = cell_details[row][col].parent_j
+        row = temp_row
+        col = temp_col
+
+    # Add the source cell to the path
+    path.append((row, col))
+    # Reverse the path to get the path from source to destination
+    path.reverse()
+
+    # Print the path
+    for i in path:
+        print("->", i, end=" ")
+    print()
+
+# Implement the A* search algorithm
+
+
+def a_star_search(grid, src, dest):
+    # Check if the source and destination are valid
+    if not is_valid(src[0], src[1]) or not is_valid(dest[0], dest[1]):
+        print("Source or destination is invalid")
+        return
+
+    # Check if the source and destination are unblocked
+    if not is_unblocked(grid, src[0], src[1]) or not is_unblocked(grid, dest[0], dest[1]):
+        print("Source or the destination is blocked")
+        return
+
+    # Check if we are already at the destination
+    if is_destination(src[0], src[1], dest):
+        print("We are already at the destination")
+        return
+
+    # Initialize the closed list (visited cells)
+    closed_list = [[False for _ in range(COL)] for _ in range(ROW)]
+    # Initialize the details of each cell
+    cell_details = [[Cell() for _ in range(COL)] for _ in range(ROW)]
+
+    # Initialize the start cell details
+    i = src[0]
+    j = src[1]
+    cell_details[i][j].f = 0
+    cell_details[i][j].g = 0
+    cell_details[i][j].h = 0
+    cell_details[i][j].parent_i = i
+    cell_details[i][j].parent_j = j
+
+    # Initialize the open list (cells to be visited) with the start cell
+    open_list = []
+    heapq.heappush(open_list, (0.0, i, j))
+
+    # Initialize the flag for whether destination is found
+    found_dest = False
+
+    # Main loop of A* search algorithm
+    while len(open_list) > 0:
+        # Pop the cell with the smallest f value from the open list
+        p = heapq.heappop(open_list)
+
+        # Mark the cell as visited
+        i = p[1]
+        j = p[2]
+        closed_list[i][j] = True
+
+        # For each direction, check the successors
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0),
+                      (1, 1), (1, -1), (-1, 1), (-1, -1)]
+        for dir in directions:
+            new_i = i + dir[0]
+            new_j = j + dir[1]
+
+            # If the successor is valid, unblocked, and not visited
+            if is_valid(new_i, new_j) and is_unblocked(grid, new_i, new_j) and not closed_list[new_i][new_j]:
+                # If the successor is the destination
+                if is_destination(new_i, new_j, dest):
+                    # Set the parent of the destination cell
+                    cell_details[new_i][new_j].parent_i = i
+                    cell_details[new_i][new_j].parent_j = j
+                    print("The destination cell is found")
+                    # Trace and print the path from source to destination
+                    trace_path(cell_details, dest)
+                    found_dest = True
+                    return
+                else:
+                    # Calculate the new f, g, and h values
+                    g_new = cell_details[i][j].g + 1.0
+                    h_new = calculate_h_value(new_i, new_j, dest)
+                    f_new = g_new + h_new
+
+                    # If the cell is not in the open list or the new f value is smaller
+                    if cell_details[new_i][new_j].f == float('inf') or cell_details[new_i][new_j].f > f_new:
+                        # Add the cell to the open list
+                        heapq.heappush(open_list, (f_new, new_i, new_j))
+                        # Update the cell details
+                        cell_details[new_i][new_j].f = f_new
+                        cell_details[new_i][new_j].g = g_new
+                        cell_details[new_i][new_j].h = h_new
+                        cell_details[new_i][new_j].parent_i = i
+                        cell_details[new_i][new_j].parent_j = j
+
+    # If the destination is not found after visiting all cells
+    if not found_dest:
+        print("Failed to find the destination cell")
+
+# Driver Code
+
+
+def main():
+    # Define the grid (1 for unblocked, 0 for blocked)
+    grid = [
+        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 0, 1, 1, 1, 0, 1, 1],
+        [1, 1, 1, 0, 1, 1, 0, 1, 0, 1],
+        [0, 0, 1, 0, 1, 0, 0, 0, 0, 1],
+        [1, 1, 1, 0, 1, 1, 1, 0, 1, 0],
+        [1, 0, 1, 1, 1, 1, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 1, 0, 0, 0, 1],
+        [1, 0, 1, 1, 1, 1, 0, 1, 1, 1],
+        [1, 1, 1, 0, 0, 0, 1, 0, 0, 1]
+    ]
+
+    # Define the source and destination
+    src = [8, 0]
+    dest = [0, 0]
+
+    # Run the A* search algorithm
+    a_star_search(grid, src, dest)
+
+
+if __name__ == "__main__":
+    main()
+
+
+
+################## 5 minmax algo for game playing ########
+import math
+
+# Function to check if a player has won
+def evaluate(board):
+    # Rows
+    for row in board:
+        if row[0] == row[1] == row[2] and row[0] != '_':
+            return 10 if row[0] == 'X' else -10
+
+    # Columns
+    for col in range(3):
+        if board[0][col] == board[1][col] == board[2][col] and board[0][col] != '_':
+            return 10 if board[0][col] == 'X' else -10
+
+    # Diagonals
+    if board[0][0] == board[1][1] == board[2][2] and board[0][0] != '_':
+        return 10 if board[0][0] == 'X' else -10
+
+    if board[0][2] == board[1][1] == board[2][0] and board[0][2] != '_':
+        return 10 if board[0][2] == 'X' else -10
+
+    # No winner
+    return 0
+
+# Function to check if there are moves left
+def is_moves_left(board):
+    for row in board:
+        if '_' in row:
+            return True
+    return False
+
+# Minimax algorithm
+def minimax(board, depth, is_max):
+    score = evaluate(board)
+
+    # If Maximizer has won the game
+    if score == 10:
+        return score - depth
+
+    # If Minimizer has won the game
+    if score == -10:
+        return score + depth
+
+    # If no more moves and no winner
+    if not is_moves_left(board):
+        return 0
+
+    # If it's the maximizer's move
+    if is_max:
+        best = -math.inf
+
+        for i in range(3):
+            for j in range(3):
+                # Check if cell is empty
+                if board[i][j] == '_':
+                    board[i][j] = 'X'
+                    best = max(best, minimax(board, depth + 1, False))
+                    board[i][j] = '_'
+
+        return best
+
+    # If it's the minimizer's move
+    else:
+        best = math.inf
+
+        for i in range(3):
+            for j in range(3):
+                if board[i][j] == '_':
+                    board[i][j] = 'O'
+                    best = min(best, minimax(board, depth + 1, True))
+                    board[i][j] = '_'
+
+        return best
+
+# Function to find the best move for the maximizing player (X)
+def find_best_move(board):
+    best_val = -math.inf
+    best_move = (-1, -1)
+
+    for i in range(3):
+        for j in range(3):
+            # Check if the cell is empty
+            if board[i][j] == '_':
+                # Make the move
+                board[i][j] = 'X'
+
+                # Compute the evaluation function for this move
+                move_val = minimax(board, 0, False)
+
+                # Undo the move
+                board[i][j] = '_'
+
+                # If the value of the current move is more than the best value, update best_move
+                if move_val > best_val:
+                    best_move = (i, j)
+                    best_val = move_val
+
+    return best_move
+
+# Example Tic-Tac-Toe board
+board = [
+    ['X', 'O', 'X'],
+    ['_', 'O', '_'],
+    ['_', '_', '_']
+]
+
+best_move = find_best_move(board)
+print(f"The best move for 'X' is at position: {best_move}")
+
+
+
+################## 6 N Queens problem #######
+N = 8
+
+def solveNQueens(board,col):
+  if col == N :
+   print(board)
+   return True
+
+  for i in range(N):
+    if isSafe(board,i,col):
+     board[i][col] = 1
+     if solveNQueens(board,col+1):
+      return True
+    board[i][col] = 0
+  return False
+
+###Iterate over each row i in the current column col.
+Check if it’s safe to place a queen at (i, col) using the isSafe function.
+Place the queen (board[i][col] = 1) and recursively solve for the next column (col + 1).
+If placing a queen leads to no solution, backtrack by removing the queen (board[i][col] = 0).
+Return False if no valid placement is found in the current column.
+Safety Check Function: isSafe
+
+
+def isSafe(board, row, col):
+  for x in range (col):
+    if board[row][x] == 1:
+     return False   # checking all previous columns in same row
+  for x, y in zip(range(row, -1, -1), range(col, -1, -1)):
+    if board[x][y] == 1:
+        return False   # checking left upper diagonal
+  for x, y in zip(range(row, N, 1), range(col, -1, -1)):
+      if board[x][y] == 1:
+        return False   # checking lower diagonal
+  return True
+  board = [[0 for x in range(N)] for y in range(N)]
+
+
+
+
+board = [[0 for x in range(N)] for y in range(N)]
+if not solveNQueens(board, 0):
+    print("No solution found")
+
+
+
+######## 7 forward chaining #################
+facts = ["A", "B"]
+
+#(condition, conclusion)
+rules = [
+    (["A", "B"], "C"),  # If A and B are true, then C is true
+    (["C"], "D"),       # If C is true, then D is true
+    (["D"], "E")        # If D is true, then E is true
+]
+
+def forward_chaining(facts, rules):
+    inferred = set(facts) 
+    new_fact_added = True
+
+    while new_fact_added:
+        new_fact_added = False  
+        for rule in rules:  
+            conditions, conclusion = rule  
+            
+            # Check if all conditions are satisfied
+            all_conditions_met = True
+            for condition in conditions: 
+                if condition not in inferred:
+                    all_conditions_met = False
+                    break  
+            
+     
+            if all_conditions_met and conclusion not in inferred:
+                inferred.add(conclusion)  
+                print(f"Inferred new fact: {conclusion}")
+                new_fact_added = True  
+                
+    return inferred  
+
+
+print("Initial facts:", facts)
+inferred_facts = forward_chaining(facts, rules)
+print("Final inferred facts:", inferred_facts)
+
+
+
+
+################# 8 backward chaining #########
+# Define rules and facts
+class BackwardChaining:
+    def __init__(self):
+        # Rules in the format: {conclusion: [conditions]}
+        self.rules = {
+            "rain": ["cloudy"],
+            "cloudy": ["humid"],
+            "humid": ["high_temperature"]
+        }
+        # Facts that are known
+        self.facts = {"high_temperature"}
+
+    # Backward chaining function
+    def backward_chain(self, goal):
+        if goal in self.facts:
+            print(f"Goal {goal} is a known fact.")
+            return True
+
+        if goal not in self.rules:
+            print(f"Goal {goal} has no rules, and it is not a known fact.")
+            return False
+
+        # Check the conditions for the rule that leads to the goal
+        for condition in self.rules[goal]:
+            print(f"Checking if {condition} is true to achieve {goal}.")
+            if not self.backward_chain(condition):
+                print(f"Failed to prove {condition}, so {goal} is false.")
+                return False
+
+        print(f"All conditions for {goal} are satisfied.")
+        return True
+
+
+# Example usage
+bc = BackwardChaining()
+goal = "rain"
+result = bc.backward_chain(goal)
+
+if result:
+    print(f"The goal {goal} is true.")
+else:
+    print(f"The goal {goal} is false.")
+
